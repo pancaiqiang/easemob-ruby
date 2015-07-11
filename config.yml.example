@@ -1,0 +1,6 @@
+easemob:
+  client_id: client_id
+  client_secret: client_secret
+  host: 'https://a1.easemob.com'
+  org_name: org_name
+  app_name: app_name

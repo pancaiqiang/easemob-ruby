@@ -1,5 +1,13 @@
-require "easemob/version"
+require 'easemob/version'
 
 module Easemob
-  # Your code goes here...
+  class << self
+    def configuration
+      @configuration ||=  Configuration.new
+    end
+
+    def configure
+      yield(configuration) if block_given?
+    end
+  end
 end
