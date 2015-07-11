@@ -19,11 +19,11 @@ And then execute:
 ```ruby
 # rails_app/config/initializers/easemob.rb
 Easemob.configure do |config|
-  config.client_id = @deault_config[:client_id]
-  config.client_secret = @deault_config[:client_secret]
-  config.host = @deault_config[:host]
-  config.org_name = @deault_config[:org_name]
-  config.app_name = @deault_config[:app_name]
+  config.client_id = ''
+  config.client_secret = ''
+  config.host = ''
+  config.org_name = ''
+  config.app_name = ''
 end
 $client = Easemob::Client.new
 
