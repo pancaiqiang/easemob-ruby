@@ -9,20 +9,38 @@ TODO: Delete this and the text above, and describe your gem
 Add this line to your application's Gemfile:
 
 ```ruby
-gem 'easemob'
+gem 'easemob', github: 'FlowerWrong/easemob'
 ```
 
 And then execute:
 
     $ bundle
 
-Or install it yourself as:
-
-    $ gem install easemob
-
 ## Usage
 
-TODO: Write usage instructions here
+```ruby
+# rails_app/config/initializers/easemob.rb
+Easemob.configure do |config|
+  config.client_id = @deault_config[:client_id]
+  config.client_secret = @deault_config[:client_secret]
+  config.host = @deault_config[:host]
+  config.org_name = @deault_config[:org_name]
+  config.app_name = @deault_config[:app_name]
+end
+$client = Easemob::Client.new
+
+
+# Token, you need to store it yourself, eg: redis.
+token_hash = $client.authorize
+```
+
+## rspec
+
+```ruby
+cp config.yml.example config.yml
+# edit it
+rake spec
+```
 
 ## Development
 
@@ -32,10 +50,9 @@ To install this gem onto your local machine, run `bundle exec rake install`. To 
 
 ## Contributing
 
-Bug reports and pull requests are welcome on GitHub at https://github.com/[USERNAME]/easemob. This project is intended to be a safe, welcoming space for collaboration, and contributors are expected to adhere to the [Contributor Covenant](contributor-covenant.org) code of conduct.
+Bug reports and pull requests are welcome on GitHub at https://github.com/FlowerWrong/easemob. This project is intended to be a safe, welcoming space for collaboration, and contributors are expected to adhere to the [Contributor Covenant](contributor-covenant.org) code of conduct.
 
 
 ## License
 
 The gem is available as open source under the terms of the [MIT License](http://opensource.org/licenses/MIT).
-
