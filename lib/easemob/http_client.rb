@@ -3,15 +3,14 @@ require 'openssl'
 
 class HttpClient
   # 发送Get请求
-  def get_request(url, params, header=nil)
+  def get_request(url, params = nil, header = nil)
     uri = URI(url)
-    uri.query = URI.encode_www_form(params)
+    uri.query = URI.encode_www_form(params) unless params.nil?
     req = Net::HTTP::Get.new(uri)
     if header
       req.initialize_http_header(header)
     end
-    http = Net::HTTP.new(uri.host, uri.port)
-    http.request req
+    [uri, req]
   end
 
   # 合成Post请求参数
@@ -27,7 +26,7 @@ class HttpClient
   end
 
   # 合成Delete请求参数
-  def del_request(url, header=nil)
+  def del_request(url, header = nil)
     uri = URI.parse(url)
     req = Net::HTTP::Delete.new(uri)
     if header
@@ -41,9 +40,9 @@ class HttpClient
     http = Net::HTTP.new(uri.host, uri.port)
     http.read_timeout = 3000
     if uri.scheme == 'https'
-      http.use_ssl     = true
-      verify_mode      = OpenSSL::SSL::VERIFY_NONE  # OpenSSL::SSL::VERIFY_PEER
-      http.verify_mode = OpenSSL::SSL.const_get(verify_mode)
+      http.use_ssl = true
+      verify_mode = OpenSSL::SSL::VERIFY_NONE  # OpenSSL::SSL::VERIFY_PEER
+      http.verify_mode = verify_mode
     end
     http.request request
   end
