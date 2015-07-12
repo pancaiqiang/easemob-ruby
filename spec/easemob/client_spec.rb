@@ -16,6 +16,7 @@ describe Easemob::Client do
     end
     @client = Easemob::Client.new
     @token_hash = @client.authorize
+    @token = @token_hash[:access_token]
   end
 
   it 'should new a client' do
@@ -23,24 +24,90 @@ describe Easemob::Client do
   end
 
   it 'should get authorize token' do
-    expect(@token_hash[:access_token].length).to eq(63)
+    expect(@token.length).to eq(63)
     expect(@token_hash[:expires_in].to_s).to match(/\d+/)
   end
 
   # it 'should register_single_user' do
-  #   res_hash = @client.register_single_user(@token_hash[:access_token], 'yangfusheng', '12345678', 'yang')
+  #   res_hash = @client.register_single_user(@token, 'yangfusheng', '12345678', 'yang')
   #   expect(res_hash[:entities].length).to eq(1)
-  #   expect(res_hash[:entities][:username]).to eq('yangfusheng')
+  #   expect(res_hash[:entities][0][:username]).to eq('yangfusheng')
+  # end
+
+  # it 'should register_multi_users' do
+  #   params = []
+  #   1.upto(3).each do |i|
+  #     user = {
+  #       username: "yangfusheng#{i}",
+  #       password: '12345678',
+  #       nickname: "yang#{i}"
+  #     }
+  #     params << user
+  #   end
+  #   res_hash = @client.register_multi_users(@token, params)
+  #   expect(res_hash[:entities].length).to eq(params.length)
   # end
 
   it 'should get_single_user' do
-    res_hash = @client.get_single_user(@token_hash[:access_token], 'yangfusheng')
+    res_hash = @client.get_single_user(@token, 'yangfusheng')
     expect(res_hash[:entities].length).to eq(1)
     expect(res_hash[:entities][0][:username]).to eq('yangfusheng')
   end
 
   it 'should get_multi_users' do
-    res_hash = @client.get_multi_users(@token_hash[:access_token], 10)
+    res_hash = @client.get_multi_users(@token, 10)
     expect(res_hash[:entities].length).to be > 0
+  end
+
+  # it 'should del_single_user' do
+  #   username = "#{rand(10)}del_single_user"
+  #   res_hash = @client.register_single_user(@token, username, '12345678', username)
+  #   expect(res_hash[:entities].length).to eq(1)
+  #   expect(res_hash[:entities][0][:username]).to eq(username)
+  #   sleep 5
+  #   res_hash = @client.del_single_user(@token, username)
+  #   expect(res_hash[:entities].length).to eq(1)
+  #   expect(res_hash[:entities][0][:username]).to eq(username)
+  # end
+
+  # it 'should del_multi_users' do
+  #   username = "#{rand(10)}del_multi_users"
+  #   res_hash = @client.register_single_user(@token, username, '12345678', username)
+  #   expect(res_hash[:entities].length).to eq(1)
+  #   expect(res_hash[:entities][0][:username]).to eq(username)
+  #   sleep 5
+  #   res_hash = @client.del_multi_users(@token, 2)
+  #   expect(res_hash[:entities].length).to eq(2)
+  # end
+
+  it 'should reset_password' do
+    res_hash = @client.reset_password(@token, 'yangfusheng', 'yangfusheng')
+    expect(res_hash[:duration].to_s).to match(/\d+/)
+  end
+
+  it 'should reset_nickname' do
+    res_hash = @client.reset_nickname(@token, 'yangfusheng', '杨浮生')
+    expect(res_hash[:entities].length).to eq(1)
+    expect(res_hash[:entities][0][:username]).to eq('yangfusheng')
+    expect(res_hash[:entities][0][:nickname]).to eq('杨浮生')
+  end
+
+  # FIXME
+  it 'should add_friend' do
+    pending "add some examples to (or delete) #{__FILE__}"
+    # 0.upto(10).each do |i|
+    #   res_hash = @client.del_single_user(@token, "#{i}add_friend")
+    #   sleep 2
+    # end
+    # username = "#{rand(10)}add_friend"
+    # res_hash = @client.register_single_user(@token, username, '12345678', username)
+    # ap res_hash
+    # expect(res_hash[:entities].length).to eq(1)
+    # expect(res_hash[:entities][0][:username]).to eq(username)
+    # sleep 5
+    # res_hash = @client.add_friend(@token, 'yangfusheng', 'yangfusheng2')
+    # ap res_hash
+    # expect(res_hash[:entities].length).to eq(1)
+    # expect(res_hash[:entities][0][:username]).to eq('yangfusheng2')
   end
 end
