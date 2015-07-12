@@ -27,6 +27,8 @@ module Easemob
       http_submit(uri, req)
     end
 
+    ## 用户体系集成
+
     # 注册IM用户[单个]
     def register_single_user(token, username, password, nickname = nil)
       url = "#{@base_url}/users"
@@ -111,6 +113,7 @@ module Easemob
     end
 
     # 解除IM用户的好友关系
+    # FIXME
     def del_friend(token, owner_username, friend_username)
       url = "#{@base_url}/users/#{owner_username}/contacts/users/#{friend_username}"
       header = token_header(token)
@@ -199,6 +202,7 @@ module Easemob
       http_submit(uri, req)
     end
 
+    # ==========================================================================
     ## 聊天记录
 
     # 导出聊天记录
@@ -209,23 +213,100 @@ module Easemob
       http_submit(uri, req)
     end
 
+    # ==========================================================================
+    # skip
     ## 图片语音文件上传、下载
-
+    # note: 只有app的登陆用户才能够上传文件
     # 上传语音图片
     # 下载图片,语音文件
     # 下载缩略图
 
+    # ==========================================================================
+    # skip
     ## 聊天相关API
 
     # 发送文本消息
     # 发送图片消息
     # ...
 
+    # ==========================================================================
     ## 群组管理
 
     # 获取app中所有的群组
-    # ...
+    def groups(token)
+      url = "#{@base_url}/chatgroups"
+      header = token_header(token)
+      uri, req = @http_client.get_request(url, nil, header)
+      http_submit(uri, req)
+    end
 
+    # 获取一个或者多个群组的详情
+    def groups_details(token, group_ids = [])
+      params = group_ids.join(',')
+      url = "#{@base_url}/chatgroups/#{params}"
+      header = token_header(token)
+      uri, req = @http_client.get_request(url, nil, header)
+      http_submit(uri, req)
+    end
+
+    # 创建一个群组
+    def create_group(token, group_params = {})
+      url = "#{@base_url}/chatgroups"
+      header = token_header(token)
+      group_private_or_not = group_params[:group_private_or_not] || false  # 是否是公开群, 此属性为必须的,为false时为私有群
+      maxusers = group_params[:maxusers] || 200  # 群组成员最大数(包括群主), 值为数值类型,默认值200,此属性为可选的
+      approval = group_params[:approval] || false  # 加入公开群是否需要批准, 默认值是false（加群不需要群主批准）, 此属性为可选的,只作用于公开群
+      params = {
+        groupname: group_params[:groupname],  # 群组名称, 此属性为必须的
+        desc: group_params[:desc],  # 群组描述, 此属性为必须的
+        public: group_private_or_not,
+        maxusers: maxusers,
+        approval: approval,
+        owner: group_params[:owner]  # 群组的管理员, 此属性为必须的
+      }
+      # 群组成员,此属性为可选的,但是如果加了此项,数组元素至少一个（注：群主jma1不需要写入到members里面）
+      params.merge!({ members: group_params[:members] }) if group_params[:members]
+      uri, req = @http_client.post_request(url, params, header)
+      http_submit(uri, req)
+    end
+
+    # 修改群组信息
+    def update_group_info(token, group_id, group_params = {})
+      url = "#{@base_url}/chatgroups/#{group_id}"
+      header = token_header(token)
+      params = {}
+      [:groupname, :description, :maxusers].each do |sym|
+        params.merge!({ sym => group_params[sym] }) if group_params[sym]
+      end
+      uri, req = @http_client.put_request(url, params, header)
+      http_submit(uri, req)
+    end
+
+    # 删除群组
+    def del_group(token, group_id)
+      url = "#{@base_url}/chatgroups/#{group_id}"
+      header = token_header(token)
+      uri, req = @http_client.del_request(url, nil, header)
+      http_submit(uri, req)
+    end
+
+    # 获取群组中的所有成员
+    def group_members(token, group_id)
+      url = "#{@base_url}/chatgroups/#{group_id}/users"
+      header = token_header(token)
+      uri, req = @http_client.get_request(url, nil, header)
+      http_submit(uri, req)
+    end
+
+    # 群组加人[单个]
+    def add_member(token, group_id, username)
+      url = "#{@base_url}/chatgroups/#{group_id}/users/#{username}"
+      header = token_header token
+      uri, req = @http_client.post_request url, nil, header
+      http_submit uri, req
+    end
+
+    # ==========================================================================
     ## 聊天室管理
 
     # 创建聊天室
@@ -242,7 +323,8 @@ module Easemob
     def http_submit(uri, req)
       res = @http_client.submit(uri, req)
       res_hash = JSON.parse res.body
-      res_hash.kind_of?(Array) ? res_hash.map(&:deep_symbolize_keys!) : res_hash.deep_symbolize_keys!
+      res_hash = res_hash.kind_of?(Array) ? res_hash.map(&:deep_symbolize_keys!) : res_hash.deep_symbolize_keys!
+      res_hash[:http_code] = res.code
     end
   end
 end
