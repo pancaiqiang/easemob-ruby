@@ -17,6 +17,8 @@ describe Easemob::Client do
     end
     @client = Easemob::Client.new
     @token_hash = @client.authorize
+    p '-' * 20
+    ap @token_hash
     @token = @token_hash[:access_token]
   end
 

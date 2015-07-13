@@ -306,10 +306,50 @@ module Easemob
       http_submit uri, req
     end
 
+    # 群组加人[批量]
+    def add_members(token, group_id, usernames = [])
+      url = "#{@base_url}/chatgroups/#{group_id}/users"
+      header = token_header token
+      params = { usernames: usernames }
+      uri, req = @http_cleint.post_request url, params, header
+      http_submit uri, req
+    end
+
+    # 群组减人
+    def del_member(token, group_id, username)
+      url = "#{@base_url}/chatgroups/#{group_id}/users/#{username}"
+      header = token_header token
+      uri, req = @http_client.del_request url, nil, header
+      http_submit uri, req
+    end
+
+    # 获取一个用户参与的所有群组
+    def user_gropus(token, username)
+      url = "#{@base_url}/users/#{username}/joined_chatgroups"
+      header = token_header token
+      uri, req = @http_client.get_request url, nil, header
+      http_submit uri, req
+    end
+
     # ==========================================================================
     ## 聊天室管理
 
     # 创建聊天室
+    def create_room(token, room = {})
+      url = "#{@base_url}/chatrooms"
+      header = token_header token
+      maxusers = room[:maxusers] || 200
+      params = {
+        name: room[:name],
+        description: room[:description],
+        maxusers: maxusers,
+        owner: room[:owner]
+      }
+      params.merge!({ members: room[:members] }) if room[:members]
+      uri, req = @http_client.post_request url, params, header
+      http_submit uri, req
+    end
+
     # 修改聊天室信息
     # ...
 
@@ -325,6 +365,7 @@ module Easemob
       res_hash = JSON.parse res.body
       res_hash = res_hash.kind_of?(Array) ? res_hash.map(&:deep_symbolize_keys!) : res_hash.deep_symbolize_keys!
       res_hash[:http_code] = res.code
+      res_hash
     end
   end
 end
