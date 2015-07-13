@@ -299,6 +299,7 @@ module Easemob
     end
 
     # 群组加人[单个]
+    # FIXME
     def add_member(token, group_id, username)
       url = "#{@base_url}/chatgroups/#{group_id}/users/#{username}"
       header = token_header token
@@ -311,7 +312,7 @@ module Easemob
       url = "#{@base_url}/chatgroups/#{group_id}/users"
       header = token_header token
       params = { usernames: usernames }
-      uri, req = @http_cleint.post_request url, params, header
+      uri, req = @http_client.post_request url, params, header
       http_submit uri, req
     end
 
@@ -351,7 +352,48 @@ module Easemob
     end
 
     # 修改聊天室信息
-    # ...
+    def update_room_info(token, room_id, room_params)
+      url = "#{@base_url}/chatrooms/#{room_id}"
+      header = token_header token
+      params = {}
+      [:name, :description, :maxusers].each do |sym|
+        params.merge!({ sym => room_params[sym] }) if room_params[sym]
+      end
+      uri, req = @http_client.put_request url, params, header
+      http_submit uri, req
+    end
+
+    # 删除聊天室
+    def del_room(token, room_id)
+      url = "#{@base_url}/chatrooms/#{room_id}"
+      header = token_header token
+      uri, req = @http_client.del_request url, nil, header
+      http_submit uri, req
+    end
+
+    # 获取app中所有的聊天室
+    def rooms(token)
+      url = "#{@base_url}/chatrooms"
+      header = token_header token
+      uri, req = @http_client.get_request url, nil, header
+      http_submit uri, req
+    end
+
+    # 获取一个聊天室详情
+    def room_info(token, room_id)
+      url = "#{@base_url}/chatrooms/#{room_id}"
+      header = token_header token
+      uri, req = @http_client.get_request url, nil, header
+      http_submit uri, req
+    end
+
+    # 获取用户加入的聊天室
+    def user_rooms(token, username)
+      url = "#{@base_url}/users/#{username}/joined_chatrooms"
+      header = token_header token
+      uri, req = @http_client.get_request url, nil, header
+      http_submit uri, req
+    end
 
     private
 
