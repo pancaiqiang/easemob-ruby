@@ -226,6 +226,19 @@ module Easemob
     ## 聊天相关API
 
     # 发送文本消息
+    def send_txt_message(token,to,message = '',from = 'admin')
+      url = "#{@base_url}/messages"
+      header = token_header(token)
+      msg = {type: 'txt',msg: message}
+      params = {
+        target_type: 'users',
+        target:       [to],
+        msg:          msg,
+        from:         from
+      }
+      uri, req = @http_client.get_request(url, params, header)
+      http_submit(uri, req)
+    end
     # 发送图片消息
     # ...
 
