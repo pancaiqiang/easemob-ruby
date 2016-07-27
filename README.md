@@ -7,7 +7,7 @@
 Add this line to your application's Gemfile:
 
 ```ruby
-gem 'easemob', github: 'FlowerWrong/easemob'
+gem 'easemob', github: 'pancaiqiang/easemob'
 ```
 
 And then execute:
